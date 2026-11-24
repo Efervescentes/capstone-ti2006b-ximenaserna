@@ -1,96 +1,40 @@
-# TI2006B Capstone - Pokémon GO-inspired data analysis
+# Reto Auditoría FEMSA · Analítico de descarga de agua
 
-Persistent project home for the TI2006B Capstone (Fall 2026), team **Efervescentes**.
-Author: Ximena Serna.
+Repositorio individual de **Ximena Yamile Serna Angulo (A00842088)**, equipo 1 (Efervescentes), TI2006B Soporte analítico para la toma de decisiones, grupo 303. Profesores: Dr. Servio Palacios Interiano y Mtra. Claudia Aja Leyva.
 
-## Project question
+## El reto
 
-Which Pokémon types and species have the highest total base stats, and how do
-size (weight) and type relate to those stats?
+Auditoría Interna de FEMSA revisa el control "Monitoreo de descargas permitidas" de las plantas de tratamiento de aguas residuales (PTAR) de Coca-Cola FEMSA en México. Hoy la revisión es manual y por muestra. El reto es construir un analítico reproducible que concilie la bitácora diaria de cada planta (formato CONAGUA, en m³) contra Reporting Factory (Power BI corporativo, en litros) y detecte lecturas anómalas, para generar un semáforo y una matriz de prioridad por planta y periodo.
 
-## Intended audience
+- Alcance: plantas de México, enero a octubre de 2026.
+- Solo cantidad de agua descargada, no calidad química.
+- El resultado orienta la revisión de Auditoría; no declara cumplimiento ni incumplimiento.
 
-Classmates and the instructor of TI2006B who want a small, reproducible example
-of a complete beginner data workflow (ingest, join, check, visualize, document).
+## Preguntas de análisis
 
-## Data source
+1. ¿Qué plantas y periodos conviene revisar primero cuando el medidor y la bitácora presentan discrepancias?
+2. ¿En qué plantas y meses la bitácora no coincide con Reporting Factory, y por cuánto?
+3. ¿Qué plantas tienen lecturas fuera de lo normal: picos, ceros, duplicados o valores constantes?
+4. ¿En qué plantas se rompe la continuidad de las lecturas?
 
-Public, community-maintained Pokémon species, type, and base-stat tables from
-the [`veekun/pokedex`](https://github.com/veekun/pokedex) repository. The
-notebook downloads them at runtime, so no dataset copy is committed here.
-See [`notebooks/README.md`](notebooks/README.md) for provenance and details.
+## Contenido
 
-## Expected output
+| Archivo | Etapa | Qué contiene |
+|---|---|---|
+| `notebooks/02-reto-femsa-etapa2-exploracion.ipynb` | Etapa 2 | Inspección de los Excel con openpyxl, importación a SQLite como tablas largas, exploración con pandas y SQL, y reglas de negocio (R1 a R13) que generan las tablas acondicionadas `bit_dia_acond` (planta-día) y `conciliacion_mes` (planta-mes). |
+| `etapa3_modelo_dimensional.sql` | Etapa 3 | Creación y carga en PostgreSQL del modelo dimensional: `dim_fecha`, `dim_planta`, `fact_registros_diarios` y `fact_conciliacion_mensual` (constelación de hechos, todo en litros). |
 
-- A data-quality summary (row counts, duplicates, missing values).
-- Interactive Plotly charts: distribution of total base stats, top species by
-  total stats, count by type, and weight vs. total stats.
-- Three written observations and one limitation in the notebook.
+## Cómo correr el cuaderno
 
-## Current limitation
+1. Abre el cuaderno en Google Colab (botón "Open in Colab" o Archivo → Abrir cuaderno → GitHub).
+2. Sube a la sesión los 2 archivos del reto con estos nombres exactos: `Bitacora descargas 2026.xlsx` y `ReportingFactory Ene26 - Oct26.xlsx`.
+3. Ejecuta todas las celdas en orden (Entorno de ejecución → Ejecutar todas).
 
-This is a Pokémon GO-inspired teaching context, not Pokémon GO player data. The
-tables describe species and base stats only; they do not include accounts,
-locations, encounters, captures, or battle results. A high total base stat is
-not the same as battle performance in Pokémon GO.
+Integridad de la bitácora (SHA256 publicado por los profesores):
+`66979994cacb55107c946b818f0e512fd744e5d7341d42be177727f1e1f6471d`
 
-## How to start
+Los datos de FEMSA no se suben a este repositorio: `data/raw/` está en `.gitignore`.
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Efervescentes/capstone-ti2006b-ximenaserna.git
-   cd capstone-ti2006b-ximenaserna
-   ```
-2. Create an environment and install dependencies (pick one):
-   ```bash
-   # Option A: pip
-   python -m venv .venv
-   source .venv/bin/activate        # Windows (Git Bash): source .venv/Scripts/activate
-   python -m pip install -r requirements.txt
+## Principio del tratamiento
 
-   # Option B: Anaconda
-   conda env create -f environment.yml
-   conda activate ti2006b-capstone
-   ```
-3. Open Jupyter and run [`notebooks/01-pokemon-go-analysis.ipynb`](notebooks/01-pokemon-go-analysis.ipynb) from the repository root:
-   ```bash
-   jupyter lab
-   ```
-
-## Repository map
-
-```text
-.
-├── .github/workflows/   # automated checks (notebook validation, quality)
-├── assignments/         # evidence for later activities
-├── dashboards/          # BI documentation, exports, screenshots
-├── data/
-│   ├── raw/             # source snapshots when permitted (not committed by default)
-│   └── processed/       # reproducible derived tables
-├── docs/                # project charter, architecture, ADRs, governance
-├── notebooks/           # exploratory notebooks and data notes
-├── reports/             # figures and written findings
-├── src/                 # reusable Python code
-├── tests/               # unit and data-quality tests
-├── environment.yml      # Anaconda environment
-├── requirements.txt     # pip dependencies
-└── README.md
-```
-
-## Rules
-
-- Never commit passwords, API keys, tokens, `.env` files, personal data, or
-  confidential company data.
-- One focused commit per meaningful change, with a descriptive message.
-- Keep notebooks runnable from the repository root.
-
-## Reflection
-
-The hardest part for another student would be not knowing what the project is
-about or how to run it, especially because the course has two templates with
-different files. When I set up this repository, the Capstone template was
-missing the Pokémon notebook and the `requirements.txt` file, so I added them
-from the init example to keep everything in one place. I also wrote the
-question, data source, and limitation at the top of the README and added a
-"How to start" section with the exact commands. The notebook downloads public
-data when it runs, so nobody needs to ask me for files to reproduce it.
+Ningún dato se elimina ni se imputa. Las anomalías se marcan con banderas y el valor original se conserva junto al corregido, porque el resultado se usa para auditoría.
